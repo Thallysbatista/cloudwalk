@@ -30,11 +30,19 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 - **PostgreSQL**: Para armazenar os dados processados.
 - **Bibliotecas Python**:
   - `pandas`
-  - `sqlalchemy`
-  - `psycopg2`
+  - `matplotlib`
+- **Ambiente Virtual**:
+   - Recomendado para isolar as dependências do projeto.
 
 ---
 
+#### Configuração do Ambiente Virtual
+
+1. **Criar o Ambiente Virtual**:
+   ```bash
+   python -m venv venv
+
+---
 #### Instalação e Configuração
 
 1. Clone o repositório:
