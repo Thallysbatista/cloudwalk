@@ -31,6 +31,9 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 - **Bibliotecas Python**:
   - `pandas`
   - `matplotlib`
+  - `seaborn`
+  - `sqlalchemy`
+  - `sklearn.preprocessing`
 - **Ambiente Virtual**:
    - Recomendado para isolar as dependências do projeto.
 
@@ -49,3 +52,21 @@ Certifique-se de ter as seguintes ferramentas instaladas:
    ```bash
    git clone https://github.com/Thallysbatista/cloudwalk.git
    cd cloudwalk-test
+
+
+#### Estrutura da Tabela no PostgreSQL `transactions`
+
+```sql
+CREATE TABLE transactions (
+    transaction_id BIGINT,
+    merchant_id BIGINT,
+    user_id BIGINT,
+    card_number VARCHAR(16),
+    transaction_date TIMESTAMP,
+    transaction_amount DOUBLE PRECISION,
+    device_id DOUBLE PRECISION,
+    has_cbk BOOLEAN
+);
+
+
+A tabela `transactions` armazena informações sobre transações financeiras, como IDs de usuário e comerciante, valores de transação, e dados do dispositivo usado para a transação. O campo `has_cbk` indica se houve chargeback.
