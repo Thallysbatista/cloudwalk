@@ -4,6 +4,11 @@ from sqlalchemy import create_engine, text, Column, Text, Boolean, TIMESTAMP
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime, timezone
 import concurrent.futures
+import os
+from dotenv import load_dotenv
+
+# Carregar as variáveis do arquivo .env
+load_dotenv()
 
 # Definir a base para o ORM
 Base = declarative_base()
@@ -17,9 +22,10 @@ class TransactionsApiResults(Base):
     rule_applied = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc))
 
-# Criar engine com pool de conexões
+# Criar engine com pool de conexões usando as variáveis de ambiente
 engine = create_engine(
-    "postgresql+psycopg2://postgres:postgres@postgres.cfk4ouc8m1sx.us-east-2.rds.amazonaws.com:5432/postgres",
+    f"postgresql+psycopg2://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASSWORD')}@"
+    f"{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_NAME')}",
     pool_size=20,
     max_overflow=0
 )

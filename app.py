@@ -3,6 +3,11 @@ import psycopg2
 from psycopg2 import pool
 from datetime import datetime
 import logging
+import os
+from dotenv import load_dotenv
+
+# Carregar as variáveis do arquivo .env
+load_dotenv()
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
@@ -10,15 +15,15 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configuração do pool de conexões com o PostgreSQL
+# Configuração do pool de conexões com o PostgreSQL usando as variáveis de ambiente
 db_pool = psycopg2.pool.ThreadedConnectionPool(
     minconn=1,
     maxconn=20,
-    database="postgres",
-    user="postgres",
-    host="postgres.cfk4ouc8m1sx.us-east-2.rds.amazonaws.com",
-    password="postgres",
-    port=5432
+    database=os.environ.get('DB_NAME'),
+    user=os.environ.get('DB_USER'),
+    host=os.environ.get('DB_HOST'),
+    password=os.environ.get('DB_PASSWORD'),
+    port=os.environ.get('DB_PORT')
 )
 
 # Função para obter uma conexão do pool
