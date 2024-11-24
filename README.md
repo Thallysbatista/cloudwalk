@@ -20,7 +20,7 @@ O objetivo é analisar e processar os dados transacionais de forma eficiente, ex
   3. Insere os dados processados em um banco de dados PostgreSQL.
 - **`README.md`**: Instruções e informações detalhadas sobre o projeto.
 - **`app.py`**: API antifraude implementada em Flask.
-- **`test_app.py`**: Script de testes que processa transações e envia os dados para a API.
+- **`avaliador_transacoes.py`**: Script de testes que processa transações e envia os dados para a API.
 
 ---
 
@@ -151,7 +151,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 3. **Analisar dados da tabela transactions e inserir no banco**
    ```bash
-   python test_app.py
+   python avaliador_transacoes.py
    ```
 
 4. **Análise no Metabase:**
@@ -162,7 +162,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 #### Testes e Validação
 
 1. **Testes Automáticos:**
-   - O script ``test_app.py`` processa dados existentes da tabela transactions e os envia para a API.
+   - O script ``avaliador_transacoes.py`` processa dados existentes da tabela transactions e os envia para a API.
    - Resultados são salvos na tabela ``transactions_api_results`` para comparação futura.
 
 2. **Acurácia:**
