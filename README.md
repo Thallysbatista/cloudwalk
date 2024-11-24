@@ -19,8 +19,9 @@ O objetivo é analisar e processar os dados transacionais de forma eficiente, ex
   2. Realiza transformações e análises básicas.
   3. Insere os dados processados em um banco de dados PostgreSQL.
 - **`README.md`**: Instruções e informações detalhadas sobre o projeto.
-- **`app.py`**: API antifraude implementada em Flask.
-- **`avaliador_transacoes.py`**: Script de testes que processa transações e envia os dados para a API.
+- **`app_api_transacoes_unitarias.py`**: API antifraude implementada em Flask que avalia transações unitárias.
+- **`avaliador_transacoes.py`**: Script que processa transações em lote e envia os dados para a API para avaliação.
+- **`cliente.py`**: Script cliente que envia transações individuais para a API para avaliação.
 
 ---
 
@@ -110,6 +111,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
   - `psycopg2`
   - `requests`
   - `concurrent.futures`  
+  - `python-dotenv` (para carregar variáveis de ambiente do arquivo `.env`)
 - **Ambiente Virtual**:
    - Recomendado para isolar as dependências do projeto.
 
@@ -138,6 +140,15 @@ Certifique-se de ter as seguintes ferramentas instaladas:
    cd cloudwalk-test
    ```
 
+2. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+   ```env
+   DB_HOST=url_host
+   DB_NAME=nome_do_Banco_de_dados
+   DB_USER=usuario
+   DB_PASSWORD=senha_banco_de_dados
+   DB_PORT=5432
+   ```
+
 ---
 
 #### Como rodar o projeto
@@ -146,26 +157,35 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 2. **Iniciar o servidor da API**
    ```bash
-   python app.py
+   python app_api_transacoes_unitarias.py
    ```
 
-3. **Analisar dados da tabela transactions e inserir no banco**
+3. **Processar transações em lote e inserir no banco**
    ```bash
    python avaliador_transacoes.py
    ```
 
-4. **Análise no Metabase:**
+4. **Enviar transação individual para a API**
+   ```bash
+   python cliente.py
+   ```
+
+5. **Análise no Metabase:**
    [Link para dashboard](http://18.117.137.2:3000/public/dashboard/461921e1-81d7-47ca-9abf-5e59f38400fb)
 
 ---
 
 #### Testes e Validação
 
-1. **Testes Automáticos:**
+1. **Testes Automáticos em Lote:**
    - O script ``avaliador_transacoes.py`` processa dados existentes da tabela transactions e os envia para a API.
    - Resultados são salvos na tabela ``transactions_api_results`` para comparação futura.
 
-2. **Acurácia:**
+2. **Testes Unitários com Transações Individuais:**
+   - O script ``cliente.py`` permite enviar transações individuais para serem avaliadas pela API.
+   - Isso facilita a validação de cenários específicos.
+
+3. **Acurácia:**
    - A eficácia da API é avaliada comparando o status real de chargebacks ``(has_cbk)`` com a recomendação da API ``(recommendation)``.
 
 ---
@@ -214,4 +234,12 @@ A API foi projetada para receber informações de transações, avaliar com base
    "recommendation": "approve"
 }
 ```
+
+---
+
+#### Considerações Finais
+
+Este projeto visa demonstrar a capacidade de implementar uma solução para detecção de fraudes em transações financeiras, utilizando Python, Flask e PostgreSQL. A API antifraude foi desenvolvida para ser escalável, eficiente e facilmente ajustável a novas regras de negócio. Além disso, a integração com o Metabase facilita a análise dos resultados e a geração de insights para tomadas de decisão.
+
+Caso queira contribuir ou realizar melhorias, sinta-se à vontade para abrir uma issue ou um pull request no repositório do GitHub.
 
