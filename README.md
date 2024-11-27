@@ -82,6 +82,31 @@ CREATE TABLE transactions_log (
 );
 ```
 
+```sql
+INSERT INTO transactions_log (
+    transaction_id,
+    user_id,
+    merchant_id,
+    card_number,
+    transaction_date,
+    transaction_amount,
+    device_id,
+    has_chargeback
+)
+SELECT 
+    transaction_id,
+    user_id,
+    merchant_id,
+    card_number,
+    transaction_date,
+    transaction_amount,
+    device_id,
+    has_cbk
+FROM 
+    transactions;
+```
+
+
 3. Tabela ``transactions_api_results``: Salva os resultados de testes realizados pela API para validação posterior.
 
 ```sql
