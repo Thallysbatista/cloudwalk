@@ -7,10 +7,10 @@ import json
 transaction_data = {
     "transaction_id": 2342357,
     "merchant_id": 56107,
-    "user_id": 97051,
+    "user_id": 2708,
     "card_number": "434505******9116",
     "transaction_date": "2019-11-30T23:16:32.812632",
-    "transaction_amount": 5000,
+    "transaction_amount": 100,
     "device_id": 285475
 }
 

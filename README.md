@@ -64,7 +64,8 @@ CREATE TABLE transactions (
 );
 ```
 
-2. Tabela ``transactions_log``: Armazena todas as transações avaliadas pela API, com as regras aplicadas e a decisão final.
+2. Tabela ``transactions_log``: Armazena todas as transações avaliadas pela API, com as regras aplicadas e a decisão final. Além de antes de rodar a api foi inserido 
+nessa tabela dados da tabela ``transactions`` com a coluna ``rule_applied`` sendo preenchido com ``default`` em casos onde essa transação já tinha sido avaliada. Assim, teremos um histório para basear as futuras transações.
 
 ```sql
 CREATE TABLE transactions_log (
