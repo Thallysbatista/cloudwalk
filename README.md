@@ -69,43 +69,37 @@ nessa tabela dados da tabela ``transactions`` com a coluna ``rule_applied`` send
 
 ```sql
 CREATE TABLE transactions_log (
-    transaction_id BIGINT PRIMARY KEY,
-    user_id BIGINT,
-    merchant_id BIGINT,
-    card_number VARCHAR(16),
-    transaction_date TIMESTAMP,
-    transaction_amount DOUBLE PRECISION,
-    device_id BIGINT,
-    recommendation VARCHAR(20),
-    rule_applied VARCHAR(50),
-    has_chargeback BOOLEAN
+    transaction_id TEXT PRIMARY KEY,          -- Identificador único da transação
+    user_id TEXT NOT NULL,                    -- ID do usuário
+    merchant_id TEXT NOT NULL,                -- ID do comerciante
+    card_number TEXT NOT NULL,                -- Número do cartão
+    transaction_date TIMESTAMP NOT NULL,      -- Data e hora da transação
+    transaction_amount NUMERIC NOT NULL,      -- Valor da transação
+    device_id TEXT,                           -- ID do dispositivo
+    recommendation TEXT NOT NULL,             -- "approve" ou "deny"
+    rule_applied TEXT,                        -- Regra responsável pela decisão
+    created_at TIMESTAMP DEFAULT NOW()        -- Data de registro no log
 );
+
 ```
 
 ```sql
 INSERT INTO transactions_log (
-    transaction_id,
-    user_id,
-    merchant_id,
-    card_number,
-    transaction_date,
-    transaction_amount,
-    device_id,
-    has_chargeback
+    transaction_id, user_id, merchant_id, card_number,
+    transaction_date, transaction_amount, device_id,
+    has_chargeback, recommendation, rule_applied
 )
-SELECT 
-    transaction_id,
-    user_id,
-    merchant_id,
-    card_number,
-    transaction_date,
-    transaction_amount,
-    device_id,
-    has_cbk
-FROM 
-    transactions;
+SELECT
+    transaction_id, user_id, merchant_id, card_number,
+    transaction_date, transaction_amount, device_id,
+    has_cbk AS has_chargeback,                              -- Status do chargeback existente
+    CASE                                                    -- Gerar recomendação inicial baseada no status de chargeback
+        WHEN has_cbk = TRUE THEN 'deny'
+        ELSE 'approve'
+    END AS recommendation,
+    'historical_chargeback' AS rule_applied                 -- Marcar como dados históricos
+FROM transactions;
 ```
-
 
 3. Tabela ``transactions_api_results``: Salva os resultados de testes realizados pela API para validação posterior.
 
