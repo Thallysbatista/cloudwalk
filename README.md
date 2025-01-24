@@ -4,52 +4,53 @@
 
 ### Transactional Sample Case
 
-#### Descrição
+#### Description
 
-Este projeto aborda o case fornecido no [link](https://gist.github.com/cloudwalk-tests/76993838e65d7e0f988f40f1b1909c97#file-transactional-sample-csv).  
-O objetivo é analisar e processar os dados transacionais de forma eficiente, extraindo insights relevantes e demonstrando habilidades em manipulação de dados e banco de dados.
-
----
-
-#### Estrutura do Repositório
-
-- **`transactional_sample.csv`**: Arquivo de dados fornecido para o case.
-- **`script.ipynb`**: Script Python no formato Jupyter Notebook que:
-  1. Carrega os dados do CSV em um DataFrame.
-  2. Realiza transformações e análises básicas.
-  3. Insere os dados processados em um banco de dados PostgreSQL.
-- **`README.md`**: Instruções e informações detalhadas sobre o projeto.
-- **`app_api_transacoes_unitarias.py`**: API antifraude implementada em Flask que avalia transações unitárias.
-- **`avaliador_transacoes.py`**: Script que processa transações em lote e envia os dados para a API para avaliação.
-- **`cliente.py`**: Script cliente que envia transações individuais para a API para avaliação.
+This project addresses the case provided at [link](https://gist.github.com/cloudwalk-tests/76993838e65d7e0f988f40f1b1909c97#file-transactional-sample-csv).  
+The objective is to efficiently analyze and process transactional data, extracting relevant insights and demonstrating skills in data manipulation and database management.
 
 ---
 
-#### Tecnologias Utilizadas
+#### Repository Structure
 
-1. Banco de Dados PostgreSQL:
-   * Hospedado no AWS RDS.
-   * Contém as tabelas ``transactions``, ``transactions_log`` e ``transactions_api_results``.
+- **`transactional_sample.csv`**: Data file provided for the case.
+- **`script.ipynb`**: Python script in Jupyter Notebook format that:
+  1. Loads the CSV data into a DataFrame.
+  2. Performs basic transformations and analysis.
+  3. Inserts the processed data into a PostgreSQL database.
+- **`README.md`**: Instructions and detailed information about the project.
+- **`app_api_transacoes_unitarias.py`**: Fraud detection API implemented in Flask that evaluates individual transactions.
+- **`avaliador_transacoes.py`**: Script that processes batch transactions and sends data to the API for evaluation.
+- **`cliente.py`**: Client script that sends individual transactions to the API for evaluation.
+
+---
+
+#### Technologies Used
+
+1. PostgreSQL Database:
+   * Hosted on AWS RDS.
+   * Contains the tables ``transactions``, ``transactions_log``, and ``transactions_api_results``.
 
 2. Metabase:
-   * Instanciado no AWS EC2.
-   * Conectado ao banco de dados para criar dashboards e executar análises SQL.
+   * Hosted on AWS EC2.
+   * Connected to the database to create dashboards and execute SQL queries.
 
 3. Python:
-   * Análise exploratória, criação da API, e automação de testes.
+   * Exploratory analysis, API development, and automation testing.
 
 4. Flask:
-   * Framework utilizado para a implementação da API.
+   * Framework used for API implementation.
 
 5. SQLAlchemy:
-   * Gerenciamento de conexões e consultas ao banco de dados.
+   * Manages database connections and queries.
 
 ---
 
-#### Banco de Dados
+#### Database
 
-- Estrutura das Tabelas
-1. Tabela ``transactions``: Contém os dados transacionais originais.
+- Table Structure
+
+1. ``transactions`` Table: Stores the original transactional data.
 
 ```sql
 CREATE TABLE transactions (
@@ -64,23 +65,21 @@ CREATE TABLE transactions (
 );
 ```
 
-2. Tabela ``transactions_log``: Armazena todas as transações avaliadas pela API, com as regras aplicadas e a decisão final. Além de antes de rodar a api foi inserido 
-nessa tabela dados da tabela ``transactions`` com a coluna ``rule_applied`` sendo preenchido com ``default`` em casos onde essa transação já tinha sido avaliada. Assim, teremos um histório para basear as futuras transações.
+2. ``transactions_log`` Table: Stores all transactions evaluated by the API, including applied rules and the final decision. Before running the API, data from the ``transactions`` table was inserted into this table with the ``rule_applied`` column set to ``default`` in cases where the transaction had already been evaluated. This ensures a historical record for future transaction evaluations.
 
 ```sql
 CREATE TABLE transactions_log (
-    transaction_id TEXT PRIMARY KEY,          -- Identificador único da transação
-    user_id TEXT NOT NULL,                    -- ID do usuário
-    merchant_id TEXT NOT NULL,                -- ID do comerciante
-    card_number TEXT NOT NULL,                -- Número do cartão
-    transaction_date TIMESTAMP NOT NULL,      -- Data e hora da transação
-    transaction_amount NUMERIC NOT NULL,      -- Valor da transação
-    device_id TEXT,                           -- ID do dispositivo
-    recommendation TEXT NOT NULL,             -- "approve" ou "deny"
-    rule_applied TEXT,                        -- Regra responsável pela decisão
-    created_at TIMESTAMP DEFAULT NOW()        -- Data de registro no log
+    transaction_id TEXT PRIMARY KEY,          -- Unique transaction identifier
+    user_id TEXT NOT NULL,                    -- User ID
+    merchant_id TEXT NOT NULL,                -- Merchant ID
+    card_number TEXT NOT NULL,                -- Card number
+    transaction_date TIMESTAMP NOT NULL,      -- Transaction date and time
+    transaction_amount NUMERIC NOT NULL,      -- Transaction amount
+    device_id TEXT,                           -- Device ID
+    recommendation TEXT NOT NULL,             -- "approve" or "deny"
+    rule_applied TEXT,                        -- Rule responsible for the decision
+    created_at TIMESTAMP DEFAULT NOW()        -- Log entry date
 );
-
 ```
 
 ```sql
@@ -92,16 +91,16 @@ INSERT INTO transactions_log (
 SELECT
     transaction_id, user_id, merchant_id, card_number,
     transaction_date, transaction_amount, device_id,
-    has_cbk AS has_chargeback,                              -- Status do chargeback existente
-    CASE                                                    -- Gerar recomendação inicial baseada no status de chargeback
+    has_cbk AS has_chargeback,                              -- Existing chargeback status
+    CASE                                                    -- Generate initial recommendation based on chargeback status
         WHEN has_cbk = TRUE THEN 'deny'
         ELSE 'approve'
     END AS recommendation,
-    'historical_chargeback' AS rule_applied                 -- Marcar como dados históricos
+    'historical_chargeback' AS rule_applied                 -- Mark as historical data
 FROM transactions;
 ```
 
-3. Tabela ``transactions_api_results``: Salva os resultados de testes realizados pela API para validação posterior.
+3. ``transactions_api_results`` Table: Stores test results performed by the API for later validation.
 
 ```sql
 CREATE TABLE transactions_api_results (
@@ -115,13 +114,13 @@ CREATE TABLE transactions_api_results (
 
 ---
 
-#### Pré-Requisitos
+#### Prerequisites
 
-Certifique-se de ter as seguintes ferramentas instaladas:
+Make sure you have the following tools installed:
 
-- **Python 3.8+**: Para rodar o script.
-- **PostgreSQL**: Para armazenar os dados processados.
-- **Bibliotecas Python**:
+- **Python 3.8+**: To run the script.
+- **PostgreSQL**: To store the processed data.
+- **Python Libraries**:
   - `pandas`
   - `matplotlib`
   - `seaborn`
@@ -131,135 +130,105 @@ Certifique-se de ter as seguintes ferramentas instaladas:
   - `psycopg2`
   - `requests`
   - `concurrent.futures`  
-  - `python-dotenv` (para carregar variáveis de ambiente do arquivo `.env`)
-- **Ambiente Virtual**:
-   - Recomendado para isolar as dependências do projeto.
+  - `python-dotenv` (to load environment variables from the `.env` file)
+- **Virtual Environment**:
+   - Recommended to isolate project dependencies.
 
 ---
 
-#### Configuração do Ambiente Virtual
+#### Virtual Environment Setup
 
-1. **Criar o Ambiente Virtual**:
+1. **Create the Virtual Environment**:
    ```bash
    python -m venv venv
    source venv/Scripts/activate
    ```
 
-2. **Instalar as dependências**:
+2. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
 ---
 
-#### Instalação e Configuração
+#### Installation and Configuration
 
-1. Clone o repositório:
+1. Clone the repository:
    ```bash
    git clone https://github.com/Thallysbatista/cloudwalk.git
    cd cloudwalk-test
    ```
 
-2. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+2. Create a `.env` file in the project root with the following variables:
    ```env
    DB_HOST=url_host
-   DB_NAME=nome_do_Banco_de_dados
-   DB_USER=usuario
-   DB_PASSWORD=senha_banco_de_dados
+   DB_NAME=database_name
+   DB_USER=username
+   DB_PASSWORD=database_password
    DB_PORT=5432
    ```
 
 ---
 
-#### Como rodar o projeto
+#### How to Run the Project
 
-1.  **Execute os scripts SQL para criar as tabelas.**
+1. **Execute the SQL scripts to create the tables.**
 
-2. **Iniciar o servidor da API**
+2. **Start the API server**
    ```bash
    python app_api_transacoes_unitarias.py
    ```
 
-3. **Processar transações em lote e inserir no banco**
+3. **Process batch transactions and insert into the database**
    ```bash
    python avaliador_transacoes.py
    ```
 
-4. **Enviar transação individual para a API**
+4. **Send an individual transaction to the API**
    ```bash
    python cliente.py
    ```
 
-5. **Análise no Metabase:**
-   [Link para dashboard](http://18.117.137.2:3000/public/dashboard/461921e1-81d7-47ca-9abf-5e59f38400fb)
+5. **Analysis in Metabase:**
+   [Link to dashboard](http://18.117.137.2:3000/public/dashboard/461921e1-81d7-47ca-9abf-5e59f38400fb)
 
 ---
 
-#### Testes e Validação
+#### Testing and Validation
 
-1. **Testes Automáticos em Lote:**
-   - O script ``avaliador_transacoes.py`` processa dados existentes da tabela transactions e os envia para a API.
-   - Resultados são salvos na tabela ``transactions_api_results`` para comparação futura.
+1. **Automated Batch Testing:**
+   - The ``avaliador_transacoes.py`` script processes existing data from the transactions table and sends them to the API.
+   - Results are stored in the ``transactions_api_results`` table for future comparison.
 
-2. **Testes Unitários com Transações Individuais:**
-   - O script ``cliente.py`` permite enviar transações individuais para serem avaliadas pela API.
-   - Isso facilita a validação de cenários específicos.
+2. **Unit Testing with Individual Transactions:**
+   - The ``cliente.py`` script allows sending individual transactions to be evaluated by the API.
+   - This facilitates validation of specific scenarios.
 
-3. **Acurácia:**
-   - A eficácia da API é avaliada comparando o status real de chargebacks ``(has_cbk)`` com a recomendação da API ``(recommendation)``.
-
----
-
-#### API Antifraude
-
-A API foi projetada para receber informações de transações, avaliar com base em regras predefinidas, e retornar uma recomendação para "aprovar" ou "negar".
-
-- **Regras Implementadas**
-
-1. **Histórico de Chargebacks:**
-   - Negar transações de usuários, comerciantes ou cartões com histórico de chargebacks.
-
-2. **Valor Elevado e Horários Críticos:**
-   - Negar transações acima de R$ 1800 realizadas entre 20h e 4h.
-
-3. **Frequência de Transações:**
-   - Negar transações de dispositivos que realizaram mais de 3 transações em 1 hora, e cujo valor total ultrapasse R$ 2500.
-
-4. **Aprovação Padrão:**
-   - Transações que não atendem aos critérios acima são aprovadas.
+3. **Accuracy:**
+   - The API's effectiveness is evaluated by comparing the actual chargeback status ``(has_cbk)`` with the API's recommendation ``(recommendation)``.
 
 ---
 
-#### Exemplo de Payload
+#### Fraud Detection API
 
-- **Entrada**:
+The API is designed to receive transaction information, evaluate it based on predefined rules, and return a recommendation to "approve" or "deny".
 
-```json
-{
-   "transaction_id": 21320398,
-   "merchant_id": 29744,
-   "user_id": 97051,
-   "card_number": "434505******9116",
-   "transaction_date": "2019-12-01T23:16:32.812632",
-   "transaction_amount": 374.56,
-   "device_id": 285475
-}
-```
+- **Implemented Rules**
 
-- **Saída**:
+1. **Chargeback History:**
+   - Deny transactions from users, merchants, or cards with a chargeback history.
 
-```json
-{
-   "transaction_id": 21320398,
-   "recommendation": "approve"
-}
-```
+2. **High Value and Critical Hours:**
+   - Deny transactions above R$ 1800 made between 8 PM and 4 AM.
+
+3. **Transaction Frequency:**
+   - Deny transactions from devices that made more than 3 transactions in 1 hour, with a total amount exceeding R$ 2500.
+
+4. **Default Approval:**
+   - Transactions that do not meet the above criteria are approved.
 
 ---
 
-#### Considerações Finais
+#### Final Considerations
 
-Este projeto visa demonstrar a capacidade de implementar uma solução para detecção de fraudes em transações financeiras, utilizando Python, Flask e PostgreSQL. A API antifraude foi desenvolvida para ser escalável, eficiente e facilmente ajustável a novas regras de negócio. Além disso, a integração com o Metabase facilita a análise dos resultados e a geração de insights para tomadas de decisão.
-
-Caso queira contribuir ou realizar melhorias, sinta-se à vontade para abrir uma issue ou um pull request no repositório do GitHub.
-
+This project aims to demonstrate the ability to implement a solution for fraud detection in financial transactions using Python, Flask, and PostgreSQL. The fraud detection API was developed to be scalable, efficient, and easily adjustable to new business rules. Additionally, the integration with Metabase facilitates result analysis and insight generation for decision-making.
